@@ -496,7 +496,7 @@ function renderMain() {
     <!-- ============ FOOTER ============ -->
     <footer class="footer">
       <div class="wrap">
-        <div class="footer-monogram serif">N &amp; D</div>
+        <div class="footer-monogram serif">H &amp; S</div>
         <div class="footer-line">With love &amp; gratitude</div>
       </div>
     </footer>
