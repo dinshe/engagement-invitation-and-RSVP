@@ -1203,7 +1203,34 @@ img,svg,iframe{max-width:100%}
   }
 }
 
+/* Responsive ALL-CAPS gate title */
+.gate-title {
+  font-size: clamp(32px, 8.5vw, 48px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: 0.015em !important;
+}
 
+/* Very small Android phones and iPhones */
+@media (max-width: 380px) {
+  .gate-title {
+    font-size: 29px !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* Normal mobile phones */
+@media (min-width: 381px) and (max-width: 520px) {
+  .gate-title {
+    font-size: 34px !important;
+  }
+}
+
+/* Tablets and laptops */
+@media (min-width: 768px) {
+  .gate-title {
+    font-size: 46px !important;
+  }
+}
 </style>
 </head>
 <body>
