@@ -547,10 +547,10 @@ function rsvpFormHTML() {
         <label class="form-label">Will you be attending?</label>
         <div class="attend-toggle">
           <button type="button" class="attend-btn" id="btn-yes" data-val="yes">
-            <span class="attend-icon">âœ¦</span>Joyfully Accept
+            <span class="attend-icon">&#10022;</span>Joyfully Accept
           </button>
           <button type="button" class="attend-btn" id="btn-no" data-val="no">
-            <span class="attend-icon">âœ•</span>Regretfully Decline
+            <span class="attend-icon">&times;</span>Regretfully Decline
           </button>
         </div>
         <div class="form-error" id="err-attend"></div>
