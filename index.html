@@ -1156,6 +1156,26 @@ img,svg,iframe{max-width:100%}
 @supports(height:100dvh){#flyer-section.flyer-stage{height:100dvh}}
 @media(prefers-reduced-motion:reduce){.flyer-scroll-cue__chevron{animation:none!important}.premium-reveal,#root>.invitee-card{opacity:1!important;transform:none!important;filter:none!important}}
 
+/* Keep personalized content below the full flyer viewport */
+
+#root > .invitee-card {
+  margin-top: 40px !important;
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 520px) {
+  #root > .invitee-card {
+    margin-top: 52px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #root > .invitee-card {
+    margin-top: 58px !important;
+  }
+}
+
+
 </style>
 </head>
 <body>
