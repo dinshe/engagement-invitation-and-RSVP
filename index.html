@@ -1304,64 +1304,88 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
   }
 
   function initializePremiumExperience() {
-    const flyerSection = document.getElementById("flyer-section");
-    const flyerImage = flyerSection && flyerSection.querySelector(".flyer-image");
+    const stage = document.getElementById("flyer-section");
+    const flyer = stage && stage.querySelector(".flyer-image");
     const inviteeCard = document.querySelector(".invitee-card");
     const audio = document.getElementById("ambient-audio");
     const audioControl = document.getElementById("ambient-audio-control");
     const gate = document.getElementById("gate");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (flyerSection && flyerImage) {
-      flyerSection.classList.add("flyer-stage");
+    if (stage && flyer) {
+      stage.classList.add("flyer-stage");
 
-      // The element that actually slides up and covers the flyer as the
-      // guest scrolls — inserted immediately after this section, so its
-      // own live on-screen position is what drives the fade. This tracks
-      // the real visual coverage instead of the sticky flyer's own offset,
-      // which barely changes while it's pinned.
-      const coverAnchor = flyerSection.nextElementSibling;
+      let ticking = false;
+      let fadeOrigin = null;
 
-      let frameRequested = false;
-      function updateFlyerProgress() {
-        frameRequested = false;
-        if (reduceMotion || !coverAnchor) return;
-
-        const viewportHeight = window.innerHeight;
-        const anchorTop = coverAnchor.getBoundingClientRect().top;
-
-        // progress 0 = cover content hasn't reached the flyer yet
-        // progress 1 = cover content has risen to the top of the screen,
-        // i.e. it has finished sliding over the flyer
-        const fadeStart = viewportHeight * 0.9;
-        const fadeEnd = viewportHeight * 0.05;
-        const progress = clamp((fadeStart - anchorTop) / (fadeStart - fadeEnd), 0, 1);
-
-        const opacity = 1 - progress; // now fades all the way to 0
-        const scale = 1 - progress * 0.06;
-        const blur = progress * 3;
-
-        flyerSection.style.setProperty("--flyer-progress", progress.toFixed(3));
-        flyerSection.style.setProperty("--flyer-opacity", opacity.toFixed(3));
-        flyerSection.style.setProperty("--flyer-scale", scale.toFixed(3));
-        flyerSection.style.setProperty("--flyer-blur", blur.toFixed(2) + "px");
+      function getFadeOrigin() {
+        if (fadeOrigin !== null) return fadeOrigin;
+        fadeOrigin = stage.getBoundingClientRect().top + window.scrollY;
+        return fadeOrigin;
       }
 
-      function requestFlyerUpdate() {
-        if (frameRequested) return;
-        frameRequested = true;
-        window.requestAnimationFrame(updateFlyerProgress);
+      function updateFlyerFade() {
+        ticking = false;
+        if (reduceMotion) return;
+
+        const viewportHeight = Math.max(window.innerHeight, 1);
+        const origin = getFadeOrigin();
+        const travelled = Math.max(0, window.scrollY - origin);
+
+        /* Start fading shortly after scrolling begins. Complete the fade
+           before the personalized card reaches the upper half of the screen. */
+        const fadeStart = viewportHeight * 0.06;
+        const fadeLength = viewportHeight * 0.72;
+        const rawProgress = clamp((travelled - fadeStart) / fadeLength, 0, 1);
+        const easedProgress = 1 - Math.pow(1 - rawProgress, 1.75);
+
+        /* Exact zero at completion. This avoids the previous residual image. */
+        const opacity = rawProgress >= 0.995 ? 0 : 1 - easedProgress;
+        const scale = 1 - easedProgress * 0.055;
+        const blur = easedProgress * 5;
+        const saturation = 1 - easedProgress * 0.22;
+
+        stage.style.setProperty("--flyer-live-opacity", opacity.toFixed(4));
+        stage.style.setProperty("--flyer-live-scale", scale.toFixed(4));
+        stage.style.setProperty("--flyer-live-blur", blur.toFixed(2) + "px");
+        stage.style.setProperty("--flyer-live-saturation", saturation.toFixed(3));
+
+        /* Set the real DOM image style as well as the CSS variable so no
+           earlier body.invitation-open rule can keep opacity at 1. */
+        flyer.style.setProperty("opacity", opacity.toFixed(4), "important");
+        flyer.style.setProperty("transform", "scale(" + scale.toFixed(4) + ")", "important");
+        flyer.style.setProperty(
+          "filter",
+          "blur(" + blur.toFixed(2) + "px) saturate(" + saturation.toFixed(3) + ")",
+          "important"
+        );
+
+        stage.classList.toggle("flyer-is-fading", rawProgress > 0 && opacity > 0);
+        stage.classList.toggle("flyer-is-gone", opacity === 0);
+        flyer.style.setProperty("visibility", opacity === 0 ? "hidden" : "visible", "important");
       }
 
-      window.addEventListener("scroll", requestFlyerUpdate, { passive: true });
-      window.addEventListener("resize", requestFlyerUpdate, { passive: true });
-      updateFlyerProgress();
+      function requestFlyerFade() {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(updateFlyerFade);
+      }
+
+      window.addEventListener("scroll", requestFlyerFade, { passive: true });
+      window.addEventListener("resize", function () {
+        fadeOrigin = null;
+        requestFlyerFade();
+      }, { passive: true });
+
+      updateFlyerFade();
     }
 
-    const foregroundElements = [];
-    if (inviteeCard) foregroundElements.push(inviteeCard);
-    document.querySelectorAll("#root > section:not(#flyer-section) .wrap, #root > footer .wrap").forEach(function (element) {
-      foregroundElements.push(element);
+    const revealElements = [];
+    if (inviteeCard) revealElements.push(inviteeCard);
+    document.querySelectorAll(
+      "#root > section:not(#flyer-section) .wrap, #root > footer .wrap"
+    ).forEach(function (element) {
+      revealElements.push(element);
     });
 
     const revealObserver = new IntersectionObserver(function (entries, observer) {
@@ -1370,47 +1394,46 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
         entry.target.classList.add("premium-visible");
         observer.unobserve(entry.target);
       });
-    }, { threshold: .12, rootMargin: "0px 0px -8% 0px" });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
 
-    foregroundElements.forEach(function (element) {
+    revealElements.forEach(function (element) {
       element.classList.add("premium-reveal");
       revealObserver.observe(element);
     });
 
     if (!audio || !audioControl) return;
-    audio.volume = .28;
 
-    function updateAudioControl() {
+    audio.volume = 0.28;
+
+    function syncAudioControl() {
       const playing = !audio.paused && !audio.ended;
       audioControl.classList.toggle("is-playing", playing);
       audioControl.setAttribute("aria-pressed", String(playing));
-      audioControl.setAttribute("aria-label", playing ? "Pause background music" : "Play background music");
+      audioControl.setAttribute(
+        "aria-label",
+        playing ? "Pause background music" : "Play background music"
+      );
     }
 
     async function playAudio() {
       try {
         await audio.play();
-        updateAudioControl();
       } catch (error) {
-        updateAudioControl();
+        /* Browser may block playback until a direct user interaction. */
       }
+      syncAudioControl();
     }
 
     audioControl.addEventListener("click", function () {
-      if (audioControl.classList.contains("audio-unavailable")) return;
       if (audio.paused) playAudio();
       else audio.pause();
     });
+    audio.addEventListener("play", syncAudioControl);
+    audio.addEventListener("pause", syncAudioControl);
 
-    audio.addEventListener("play", updateAudioControl);
-    audio.addEventListener("pause", updateAudioControl);
-    audio.addEventListener("error", function () {
-      audioControl.classList.add("audio-unavailable");
-      audioControl.setAttribute("aria-label", "Background music file unavailable");
-      audioControl.title = "Upload engagement-music.mp3 beside index.html to enable music.";
-    });
-
-    if (gate) gate.addEventListener("click", playAudio, { once: true, capture: true });
+    if (gate) {
+      gate.addEventListener("click", playAudio, { once: true, capture: true });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", function () {
