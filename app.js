@@ -560,7 +560,7 @@ function rsvpFormHTML() {
         <div class="form-group">
           <label class="form-label">Number of Guests (including you)</label>
           <div class="guest-stepper">
-            <button type="button" class="stepper-btn" id="guest-minus" aria-label="Reduce guest count">âˆ’</button>
+            <button type="button" class="stepper-btn" id="guest-minus" aria-label="Reduce guest count">-</button>
             <div class="stepper-count" id="guest-count-display">1</div>
             <button type="button" class="stepper-btn" id="guest-plus" aria-label="Increase guest count">+</button>
           </div>
