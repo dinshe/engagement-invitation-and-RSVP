@@ -1,12 +1,12 @@
 // ============================================================
-// NETHMI & DINUTH — Engagement Invitation
+// HASARA & SHEHARA â€” Engagement Invitation
 // ============================================================
 
 const EVENT = {
   brideParents: "Mr. & Mrs. Liyanawanni Arachchi",
   groomParents: "Mr. & Mrs. Gamage",
-  bride: "Nethmi",
-  groom: "Dinuth",
+  bride: "Hasara",
+  groom: "Shehara",
   dateISO: "2026-08-20T09:30:00+05:30", // Sri Lanka time
   dateLabel: "20th August 2026",
   dayLabel: "Thursday",
@@ -114,11 +114,11 @@ const monogramSVG = `
 // ============================================================
 
 // ============================================================
-// RSVP submission — via Google Apps Script (writes to a Sheet you own)
+// RSVP submission â€” via Google Apps Script (writes to a Sheet you own)
 //
 // SETUP REQUIRED (one-time, ~10 min): see the deployment guide.
 // Paste your deployed Apps Script Web App URL below. Until you do,
-// RSVPs still work and save safely to each guest's own browser —
+// RSVPs still work and save safely to each guest's own browser â€”
 // you just won't see a combined live list yet.
 // ============================================================
 
@@ -145,9 +145,9 @@ async function saveRSVP(entry) {
   }
 
   if (!isAppsScriptConfigured()) {
-    // Script not wired up yet — entry is still saved locally above, but
+    // Script not wired up yet â€” entry is still saved locally above, but
     // nothing is sent to a shared Sheet.
-    console.warn("Apps Script not configured yet — RSVP saved locally only. See setup guide.");
+    console.warn("Apps Script not configured yet â€” RSVP saved locally only. See setup guide.");
     return entry;
   }
 
@@ -162,14 +162,14 @@ async function saveRSVP(entry) {
   // Apps Script Web Apps redirect once before serving the real response,
   // and that redirect doesn't reliably carry CORS headers guests' browsers
   // will accept. mode: "no-cors" sends the request without asking to read
-  // the response back — we don't need to read it, since success/failure
+  // the response back â€” we don't need to read it, since success/failure
   // is instead confirmed by opening the Sheet.
   //
   // This is deliberately its own try/catch, separate from the outer one
   // in wireRSVPForm(). The entry is already safe in localStorage by this
   // point (see above), so a flaky connection, an offline guest, or a
   // mistyped APPS_SCRIPT_URL should never block the guest from seeing
-  // their "Thank You" — it should only mean this one submission doesn't
+  // their "Thank You" â€” it should only mean this one submission doesn't
   // reach the shared Sheet, silently and without alarming the guest.
   try {
     await fetch(APPS_SCRIPT_URL, {
@@ -179,7 +179,7 @@ async function saveRSVP(entry) {
       body: body.toString(),
     });
   } catch (networkErr) {
-    console.warn("Could not reach the Apps Script Sheet — RSVP is still saved locally.", networkErr);
+    console.warn("Could not reach the Apps Script Sheet â€” RSVP is still saved locally.", networkErr);
   }
 
   return entry;
@@ -272,7 +272,7 @@ function initCountdown() {
     const now = Date.now();
     const diff = target - now;
     if (diff <= 0) {
-      el.innerHTML = `<div class="countdown-cell" style="min-width:auto;padding:16px 28px;"><div class="serif" style="font-size:20px;color:var(--gold-deep);">Today is the day! ✨</div></div>`;
+      el.innerHTML = `<div class="countdown-cell" style="min-width:auto;padding:16px 28px;"><div class="serif" style="font-size:20px;color:var(--gold-deep);">Today is the day! âœ¨</div></div>`;
       clearInterval(timer);
       return;
     }
@@ -336,7 +336,7 @@ function wireGate() {
 }
 
 // ============================================================
-// Calendar file (.ics) generator — "Add to Calendar"
+// Calendar file (.ics) generator â€” "Add to Calendar"
 // ============================================================
 
 function downloadICS() {
@@ -345,14 +345,14 @@ function downloadICS() {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Nethmi & Dinuth//Engagement//EN",
+    "PRODID:-//Hasara & Shehara//Engagement//EN",
     "BEGIN:VEVENT",
     "UID:" + Date.now() + "@hasara-shehara.engagement",
     "DTSTAMP:" + new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z",
     "DTSTART;TZID=Asia/Colombo:" + start,
     "DTEND;TZID=Asia/Colombo:" + end,
-    "SUMMARY:Nethmi & Dinuth's Engagement",
-    "DESCRIPTION:Join us as we celebrate the engagement of Nethmi & Dinuth.",
+    "SUMMARY:Hasara & Shehara's Engagement",
+    "DESCRIPTION:Join us as we celebrate the engagement of Hasara & Shehara.",
     "LOCATION:" + EVENT.hallName + ", " + EVENT.venueName + ", " + EVENT.address,
     "END:VEVENT",
     "END:VCALENDAR",
@@ -362,7 +362,7 @@ function downloadICS() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "Nethmi-and-Dinuth-Engagement.ics";
+  a.download = "Hasara-and-Shehara-Engagement.ics";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -375,20 +375,29 @@ function downloadICS() {
 
 async function shareInvite() {
   const url = window.location.href.split("#")[0];
-  const recipient = PERSONAL_INVITATION.isValid ? ` for ${PERSONAL_INVITATION.invitee}` : "";
-  const text = `A personal invitation${recipient} to the engagement ceremony of Nethmi & Dinuth on ${EVENT.dateLabel} at ${EVENT.venueName}, Galle:`;
+  const inviteeName = PERSONAL_INVITATION.isValid ? PERSONAL_INVITATION.invitee : "Guest";
+  const allocatedGuests = PERSONAL_INVITATION.isValid ? PERSONAL_INVITATION.guests : 1;
+  const guestText = allocatedGuests === 1 ? "1 guest" : `${allocatedGuests} guests`;
+
+  const text =
+    `Dear ${inviteeName},\n\n` +
+    `With great pleasure, we warmly invite you to celebrate the engagement ceremony of Hasara and Shehara.\n\n` +
+    `Date: ${EVENT.dateLabel}\n` +
+    `Venue: ${EVENT.venueName}, Unawatuna, Galle\n\n` +
+    `This invitation is reserved for ${guestText}.\n\n` +
+    `Please open your personalized invitation and kindly submit your RSVP using the link below.`;
 
   if (navigator.share) {
     try {
-      await navigator.share({ title: "Nethmi & Dinuth's Engagement", text, url });
+      await navigator.share({ title: "Hasara & Shehara | Engagement Ceremony", text, url });
       return;
-    } catch (e) {
-      /* user cancelled, fall through */
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
     }
   }
-  // Fallback: open WhatsApp share directly
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
-  window.open(waUrl, "_blank");
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + "\n\n" + url)}`;
+  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 }
 
 // ============================================================
@@ -408,7 +417,7 @@ function renderMain() {
         <div class="gate-frame">
           <div class="gate-kicker">You Are Cordially Invited To</div>
           <div class="gate-title">An Engagement<br>Ceremony</div>
-          <div class="gate-date">20 · 08 · 2026</div>
+          <div class="gate-date">20 Â· 08 Â· 2026</div>
           <div class="gate-rule" aria-hidden="true"></div>
           <div class="gate-cta-text" style="border:none; border-bottom:none; box-shadow:none; background:none;">Tap to Open Invitation</div>
         </div>
@@ -420,7 +429,7 @@ function renderMain() {
       <img
         class="flyer-image"
         src="invitation-flyer.jpg"
-        alt="Nethmi and Dinuth engagement invitation, Thursday 20th August 2026 at 9.30 a.m., Rock Fort Beach Resort, Blue Ocean Ballroom, Dalawella, Unawatuna, Galle">
+        alt="Hasara and Shehara engagement invitation, Thursday 20th August 2026 at 9.30 a.m., Rock Fort Beach Resort, Blue Ocean Ballroom, Dalawella, Unawatuna, Galle">
     </section>
 
     <!-- ============ COUNTDOWN ============ -->
@@ -538,10 +547,10 @@ function rsvpFormHTML() {
         <label class="form-label">Will you be attending?</label>
         <div class="attend-toggle">
           <button type="button" class="attend-btn" id="btn-yes" data-val="yes">
-            <span class="attend-icon">✦</span>Joyfully Accept
+            <span class="attend-icon">âœ¦</span>Joyfully Accept
           </button>
           <button type="button" class="attend-btn" id="btn-no" data-val="no">
-            <span class="attend-icon">✕</span>Regretfully Decline
+            <span class="attend-icon">âœ•</span>Regretfully Decline
           </button>
         </div>
         <div class="form-error" id="err-attend"></div>
@@ -551,7 +560,7 @@ function rsvpFormHTML() {
         <div class="form-group">
           <label class="form-label">Number of Guests (including you)</label>
           <div class="guest-stepper">
-            <button type="button" class="stepper-btn" id="guest-minus" aria-label="Reduce guest count">−</button>
+            <button type="button" class="stepper-btn" id="guest-minus" aria-label="Reduce guest count">âˆ’</button>
             <div class="stepper-count" id="guest-count-display">1</div>
             <button type="button" class="stepper-btn" id="guest-plus" aria-label="Increase guest count">+</button>
           </div>
