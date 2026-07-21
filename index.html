@@ -1131,6 +1131,172 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
   opacity: 1 !important;
 }
 
+/* ==========================================================
+   ANIMATED SCROLL INDICATOR
+   ========================================================== */
+
+.flyer-scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: max(22px, calc(env(safe-area-inset-bottom) + 14px));
+  z-index: 12;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+
+  min-width: 112px;
+  padding: 10px 15px 9px;
+
+  border: 1px solid rgba(183, 122, 52, 0.36);
+  border-radius: 999px;
+
+  color: var(--gold-deep);
+  background: rgba(255, 250, 247, 0.86);
+
+  box-shadow: 0 12px 34px rgba(73, 45, 30, 0.15);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateX(-50%) translateY(12px);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    visibility 0.35s ease;
+}
+
+body.invitation-open .flyer-scroll-cue.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.flyer-scroll-cue__text {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.flyer-scroll-cue__mouse {
+  position: relative;
+  width: 17px;
+  height: 27px;
+
+  border: 1px solid rgba(135, 83, 31, 0.72);
+  border-radius: 999px;
+}
+
+.flyer-scroll-cue__dot {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+
+  width: 3px;
+  height: 5px;
+
+  border-radius: 999px;
+  background: var(--gold-deep);
+
+  transform: translateX(-50%);
+  animation: premiumScrollDot 1.55s ease-in-out infinite;
+}
+
+.flyer-scroll-cue__chevron {
+  width: 7px;
+  height: 7px;
+
+  border-right: 1px solid var(--gold-deep);
+  border-bottom: 1px solid var(--gold-deep);
+
+  transform: rotate(45deg);
+  animation: premiumChevron 1.55s ease-in-out infinite;
+}
+
+@keyframes premiumScrollDot {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+
+  22% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+    transform: translate(-50%, 9px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 11px);
+  }
+}
+
+@keyframes premiumChevron {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(-2px) rotate(45deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(2px) rotate(45deg);
+  }
+}
+
+/* ==========================================================
+   FASTER AND EARLIER CONTENT REVEAL
+   ========================================================== */
+
+.premium-reveal {
+  opacity: 0;
+
+  transform: translate3d(0, 28px, 0) scale(0.996);
+  filter: blur(2.5px);
+
+  transition:
+    opacity 0.46s ease-out,
+    transform 0.58s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.42s ease-out;
+}
+
+.premium-reveal.premium-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+/* Faster Especially Invited card */
+
+#root > .invitee-card {
+  trans*orm: translateY(36px) scale(0.994)*
+  opacity: 0;
+  filter: blur(3px)*
+
+  transition:
+    opacity 0.48s *ase-out,
+    transform 0.62s cubic*bezier(0.16, 1, 0.3, 1),
+    filte* 0.44s ease-out;
+}
+
+#root > .invit*e-card.premium-visible {
+  opacity* 1;
+  transform: translateY(0) sca*e(1);
+  filter: blur(0);
+}
+
 </style>
 </head>
 <body>
