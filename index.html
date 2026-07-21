@@ -1136,13 +1136,33 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
 .flyer-scroll-cue{position:fixed;left:50%;bottom:max(20px,calc(env(safe-area-inset-bottom) + 12px));z-index:850;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;padding:9px 14px 8px;border:1px solid rgba(183,122,52,.38);border-radius:999px;color:var(--gold-deep);background:rgba(255,250,247,.9);box-shadow:0 12px 34px rgba(73,45,30,.16);backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-50%) translateY(12px);transition:opacity .28s,transform .32s,visibility .28s}body.invitation-open .flyer-scroll-cue.is-visible{opacity:1;visibility:visible;transform:translateX(-50%)}.flyer-scroll-cue__text{font-size:8px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}.flyer-scroll-cue__mouse{position:relative;width:17px;height:26px;border:1px solid rgba(135,83,31,.76);border-radius:999px}.flyer-scroll-cue__dot{position:absolute;top:5px;left:50%;width:3px;height:5px;border-radius:999px;background:var(--gold-deep);animation:scrollDot 1.45s ease-in-out infinite}.flyer-scroll-cue__chevron{width:7px;height:7px;border-right:1px solid var(--gold-deep);border-bottom:1px solid var(--gold-deep);transform:rotate(45deg);animation:scrollChevron 1.45s ease-in-out infinite}@keyframes scrollDot{0%{opacity:0;transform:translate(-50%,0)}20%{opacity:1}72%{opacity:1;transform:translate(-50%,9px)}100%{opacity:0;transform:translate(-50%,11px)}}@keyframes scrollChevron{0%,100%{opacity:.35;transform:translateY(-2px) rotate(45deg)}50%{opacity:1;transform:translateY(2px) rotate(45deg)}}
 .premium-reveal{opacity:0;transform:translate3d(0,24px,0) scale(.997);filter:blur(2px);transition:opacity .4s ease-out,transform .52s cubic-bezier(.16,1,.3,1),filter .36s ease-out}.premium-reveal.premium-visible{opacity:1;transform:none;filter:none}#root>.invitee-card.premium-reveal{opacity:0;transform:translateY(28px) scale(.996);filter:blur(2px);transition:opacity .42s ease-out,transform .54s cubic-bezier(.16,1,.3,1),filter .36s ease-out}#root>.invitee-card.premium-visible{opacity:1;transform:none;filter:none}
 @media(max-width:520px){.flyer-scroll-cue{bottom:max(13px,calc(env(safe-area-inset-bottom) + 7px));min-width:96px;padding:8px 11px 7px}.flyer-scroll-cue__text{font-size:7px}}
+
+/* FINAL RESPONSIVE SCROLL CUE AND DEVICE POLISH */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100dvh;overscroll-behavior-y:none}
+img,svg,iframe{max-width:100%}
+.flyer-scroll-cue{min-width:132px!important;gap:8px!important;padding:10px 17px 12px!important;pointer-events:auto!important;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.flyer-scroll-cue__mouse,.flyer-scroll-cue__dot{display:none!important}
+.flyer-scroll-cue__chevron{display:block!important;width:9px!important;height:9px!important;border-right:1.5px solid var(--gold-deep)!important;border-bottom:1.5px solid var(--gold-deep)!important;animation:finalArrowDown 1.35s ease-in-out infinite!important}
+@keyframes finalArrowDown{0%,100%{opacity:.38;transform:translateY(-2px) rotate(45deg)}50%{opacity:1;transform:translateY(4px) rotate(45deg)}}
+/* More responsive, earlier section entrances */
+.premium-reveal{opacity:0;transform:translate3d(0,20px,0) scale(.998);filter:blur(1.5px);transition:opacity .36s ease-out,transform .46s cubic-bezier(.16,1,.3,1),filter .32s ease-out}
+.premium-reveal.premium-visible{opacity:1;transform:none;filter:none}
+#root>.invitee-card.premium-reveal{transform:translateY(22px) scale(.998);filter:blur(1.5px);transition:opacity .38s ease-out,transform .48s cubic-bezier(.16,1,.3,1),filter .32s ease-out}
+#root>.invitee-card.premium-visible{opacity:1;transform:none;filter:none}
+@media(max-width:380px){.wrap{padding-left:15px!important;padding-right:15px!important}.invitee-card{width:calc(100% - 24px)!important;padding-left:16px!important;padding-right:16px!important}.attend-toggle{gap:8px}.attend-btn{font-size:12px!important;padding:13px 7px!important}.countdown-row{gap:7px!important}.countdown-cell{min-width:59px!important;padding:13px 8px!important}.flyer-scroll-cue{min-width:116px!important;padding:8px 13px 10px!important}}
+@media(min-width:768px){.wrap{max-width:620px}.invitee-card{max-width:590px}#flyer-section.flyer-stage .flyer-image{max-height:92vh}.flyer-scroll-cue{bottom:24px}}
+@media(min-width:1200px){.wrap{max-width:660px}.invitee-card{max-width:620px}}
+@supports(height:100dvh){#flyer-section.flyer-stage{height:100dvh}}
+@media(prefers-reduced-motion:reduce){.flyer-scroll-cue__chevron{animation:none!important}.premium-reveal,#root>.invitee-card{opacity:1!important;transform:none!important;filter:none!important}}
+
 </style>
 </head>
 <body>
 
 <div id="root"></div>
 
-<div class="flyer-scroll-cue" id="flyer-scroll-cue" aria-hidden="true"><span class="flyer-scroll-cue__text">Scroll to Explore</span><span class="flyer-scroll-cue__mouse"><span class="flyer-scroll-cue__dot"></span></span><span class="flyer-scroll-cue__chevron"></span></div>
+<div class="flyer-scroll-cue" id="flyer-scroll-cue" aria-hidden="true"><span class="flyer-scroll-cue__text">Scroll to Explore</span><span class="flyer-scroll-cue__chevron"></span></div>
 <audio id="ambient-audio" preload="metadata" loop playsinline><source src="engagement-music.mp3" type="audio/mpeg"></audio>
 <button class="ambient-audio-control" id="ambient-audio-control" type="button" aria-label="Play background music" aria-pressed="false"><span class="audio-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="16" cy="16" r="3"></circle></svg></span><span class="audio-bars" aria-hidden="true"><span></span><span></span><span></span></span><span class="audio-label">Music</span></button>
 <script src="config.js"></script>
@@ -1317,6 +1337,7 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
     const audioControl = document.getElementById("ambient-audio-control");
     const gate = document.getElementById("gate");
     const scrollCue = document.getElementById("flyer-scroll-cue");
+    let scrollCueDismissed = false;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (stage && flyer) {
@@ -1371,7 +1392,8 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
         stage.classList.toggle("flyer-is-gone", opacity === 0);
         flyer.style.setProperty("visibility", opacity === 0 ? "hidden" : "visible", "important");
         if (scrollCue) {
-          const showCue = document.body.classList.contains("invitation-open") && travelled < viewportHeight * 0.14;
+          if (window.scrollY > 20 || travelled > 20) scrollCueDismissed = true;
+          const showCue = document.body.classList.contains("invitation-open") && !scrollCueDismissed;
           scrollCue.classList.toggle("is-visible", showCue);
         }
       }
@@ -1405,12 +1427,26 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
         entry.target.classList.add("premium-visible");
         observer.unobserve(entry.target);
       });
-    }, { threshold: 0.025, rootMargin: "0px 0px 20% 0px" });
+    }, { threshold: 0.01, rootMargin: "0px 0px 28% 0px" });
 
     revealElements.forEach(function (element) {
       element.classList.add("premium-reveal");
       revealObserver.observe(element);
     });
+
+    if (scrollCue) {
+      const dismissScrollCue = function () {
+        scrollCueDismissed = true;
+        scrollCue.classList.remove("is-visible");
+      };
+      window.addEventListener("wheel", dismissScrollCue, { once: true, passive: true });
+      window.addEventListener("touchmove", dismissScrollCue, { once: true, passive: true });
+      scrollCue.addEventListener("click", function () {
+        dismissScrollCue();
+        const destination = document.querySelector(".invitee-card");
+        if (destination) destination.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
 
     if (!audio || !audioControl) return;
 
@@ -1445,7 +1481,7 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
     if (gate) {
       gate.addEventListener("click", function () {
         playAudio();
-        if (scrollCue) scrollCue.classList.add("is-visible");
+        if (scrollCue && !scrollCueDismissed) scrollCue.classList.add("is-visible");
       }, { once: true, capture: true });
     }
   }
