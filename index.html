@@ -7,8 +7,8 @@
 <meta name="description" content="A personal invitation to the engagement ceremony of Nethmi & Dinuth on 20th August 2026 at Rock Fort Beach Resort, Galle.">
 
 <!-- Open Graph so the WhatsApp link preview looks good -->
-<meta property="og:title" content="Nethmi & Dinuth — Engagement Ceremony">
-<meta property="og:description" content="20th August 2026 · Rock Fort Beach Resort, Unawatuna, Galle">
+<meta property="og:title" content="Nethmi & Dinuth â€” Engagement Ceremony">
+<meta property="og:description" content="20th August 2026 Â· Rock Fort Beach Resort, Unawatuna, Galle">
 <meta property="og:type" content="website">
 <!-- Replace with the full https:// address of invitation-flyer.jpg once this is hosted, so the WhatsApp preview shows the flyer itself -->
 <meta property="og:image" content="https://YOUR-DOMAIN-HERE/invitation-flyer.jpg">
@@ -1092,6 +1092,45 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
 @media(max-width:520px){#flyer-section.flyer-stage{min-height:560px}#flyer-section.flyer-stage .flyer-image{width:100%;height:auto;max-height:94svh}#root>.invitee-card{margin-top:-9svh}.audio-label{display:none}}
 @media(prefers-reduced-motion:reduce){#flyer-section.flyer-stage{position:relative;height:auto;min-height:0}#flyer-section.flyer-stage .flyer-image{opacity:1!important;visibility:visible!important;filter:none!important}#root>.invitee-card{margin-top:20px}.premium-reveal,#root>.invitee-card{opacity:1;transform:none;filter:none}}
 
+
+/* ==========================================================
+   DEFINITIVE STICKY FLYER FADE
+   Scroll position directly controls the real image opacity.
+   ========================================================== */
+#flyer-section.flyer-stage {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;
+}
+
+#flyer-section.flyer-stage .flyer-image {
+  opacity: 1 !important;
+  visibility: visible;
+  transition: none !important;
+  will-change: opacity, transform, filter;
+}
+
+#flyer-section.flyer-stage.flyer-is-fading .flyer-image {
+  opacity: var(--flyer-live-opacity, 1) !important;
+  transform: scale(var(--flyer-live-scale, 1)) !important;
+  filter: blur(var(--flyer-live-blur, 0px)) saturate(var(--flyer-live-saturation, 1)) !important;
+}
+
+#flyer-section.flyer-stage.flyer-is-gone .flyer-image {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#flyer-section.flyer-stage.flyer-is-gone {
+  background: linear-gradient(180deg, #fffaf7 0%, #f3e8e1 100%) !important;
+}
+
+#flyer-section.flyer-stage.flyer-is-gone::before,
+#flyer-section.flyer-stage.flyer-is-gone::after {
+  opacity: 1 !important;
+}
+
 </style>
 </head>
 <body>
@@ -1257,18 +1296,149 @@ body.invitation-open .ambient-audio-control{opacity:1;transform:none;pointer-eve
 
 
 <script>
-(function(){"use strict";
-function clamp(v,min,max){return Math.min(Math.max(v,min),max)}
-function init(){
- const stage=document.getElementById("flyer-section"), image=stage&&stage.querySelector(".flyer-image"), card=document.querySelector(".invitee-card"), audio=document.getElementById("ambient-audio"), control=document.getElementById("ambient-audio-control"), gate=document.getElementById("gate"), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
- if(stage&&image){stage.classList.add("flyer-stage");let ticking=false;
-  function update(){ticking=false;if(reduce)return;const vh=Math.max(window.innerHeight,1);const foregroundTop=card?card.getBoundingClientRect().top:stage.getBoundingClientRect().bottom;const fadeStart=vh*.96;const fadeEnd=vh*.34;const progress=clamp((fadeStart-foregroundTop)/(fadeStart-fadeEnd),0,1);const opacity=progress>=.985?0:Math.pow(1-progress,1.7);const scale=1-progress*.055;const blur=progress*5;document.documentElement.style.setProperty("--flyer-progress",progress.toFixed(3));document.documentElement.style.setProperty("--flyer-opacity",opacity.toFixed(3));document.documentElement.style.setProperty("--flyer-scale",scale.toFixed(3));document.documentElement.style.setProperty("--flyer-blur",blur.toFixed(2)+"px");image.style.setProperty("opacity",String(opacity),"important");image.style.setProperty("visibility",opacity===0?"hidden":"visible","important");stage.classList.toggle("flyer-vanished",opacity===0)}
-  function request(){if(!ticking){ticking=true;requestAnimationFrame(update)}}addEventListener("scroll",request,{passive:true});addEventListener("resize",request,{passive:true});update();
- }
- const reveal=[];if(card)reveal.push(card);document.querySelectorAll("#root>section:not(#flyer-section) .wrap,#root>footer .wrap").forEach(e=>reveal.push(e));const io=new IntersectionObserver((entries,o)=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("premium-visible");o.unobserve(e.target)}}),{threshold:.12,rootMargin:"0px 0px -8% 0px"});reveal.forEach(e=>{e.classList.add("premium-reveal");io.observe(e)});
- if(audio&&control){audio.volume=.28;const sync=()=>{const playing=!audio.paused&&!audio.ended;control.classList.toggle("is-playing",playing);control.setAttribute("aria-pressed",String(playing));control.setAttribute("aria-label",playing?"Pause background music":"Play background music")};const play=async()=>{try{await audio.play()}catch(e){}sync()};control.addEventListener("click",()=>audio.paused?play():audio.pause());audio.addEventListener("play",sync);audio.addEventListener("pause",sync);if(gate)gate.addEventListener("click",play,{once:true,capture:true})}
-}
-document.addEventListener("DOMContentLoaded",()=>requestAnimationFrame(init),{once:true});
+(function () {
+  "use strict";
+
+  function clamp(value, minimum, maximum) {
+    return Math.min(Math.max(value, minimum), maximum);
+  }
+
+  function initializePremiumExperience() {
+    const stage = document.getElementById("flyer-section");
+    const flyer = stage && stage.querySelector(".flyer-image");
+    const inviteeCard = document.querySelector(".invitee-card");
+    const audio = document.getElementById("ambient-audio");
+    const audioControl = document.getElementById("ambient-audio-control");
+    const gate = document.getElementById("gate");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (stage && flyer) {
+      stage.classList.add("flyer-stage");
+
+      let ticking = false;
+      let fadeOrigin = null;
+
+      function getFadeOrigin() {
+        if (fadeOrigin !== null) return fadeOrigin;
+        fadeOrigin = stage.getBoundingClientRect().top + window.scrollY;
+        return fadeOrigin;
+      }
+
+      function updateFlyerFade() {
+        ticking = false;
+        if (reduceMotion) return;
+
+        const viewportHeight = Math.max(window.innerHeight, 1);
+        const origin = getFadeOrigin();
+        const travelled = Math.max(0, window.scrollY - origin);
+
+        /* Start fading shortly after scrolling begins. Complete the fade
+           before the personalized card reaches the upper half of the screen. */
+        const fadeStart = viewportHeight * 0.06;
+        const fadeLength = viewportHeight * 0.72;
+        const rawProgress = clamp((travelled - fadeStart) / fadeLength, 0, 1);
+        const easedProgress = 1 - Math.pow(1 - rawProgress, 1.75);
+
+        /* Exact zero at completion. This avoids the previous residual image. */
+        const opacity = rawProgress >= 0.995 ? 0 : 1 - easedProgress;
+        const scale = 1 - easedProgress * 0.055;
+        const blur = easedProgress * 5;
+        const saturation = 1 - easedProgress * 0.22;
+
+        stage.style.setProperty("--flyer-live-opacity", opacity.toFixed(4));
+        stage.style.setProperty("--flyer-live-scale", scale.toFixed(4));
+        stage.style.setProperty("--flyer-live-blur", blur.toFixed(2) + "px");
+        stage.style.setProperty("--flyer-live-saturation", saturation.toFixed(3));
+
+        /* Set the real DOM image style as well as the CSS variable so no
+           earlier body.invitation-open rule can keep opacity at 1. */
+        flyer.style.setProperty("opacity", opacity.toFixed(4), "important");
+        flyer.style.setProperty("transform", "scale(" + scale.toFixed(4) + ")", "important");
+        flyer.style.setProperty(
+          "filter",
+          "blur(" + blur.toFixed(2) + "px) saturate(" + saturation.toFixed(3) + ")",
+          "important"
+        );
+
+        stage.classList.toggle("flyer-is-fading", rawProgress > 0 && opacity > 0);
+        stage.classList.toggle("flyer-is-gone", opacity === 0);
+        flyer.style.setProperty("visibility", opacity === 0 ? "hidden" : "visible", "important");
+      }
+
+      function requestFlyerFade() {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(updateFlyerFade);
+      }
+
+      window.addEventListener("scroll", requestFlyerFade, { passive: true });
+      window.addEventListener("resize", function () {
+        fadeOrigin = null;
+        requestFlyerFade();
+      }, { passive: true });
+
+      updateFlyerFade();
+    }
+
+    const revealElements = [];
+    if (inviteeCard) revealElements.push(inviteeCard);
+    document.querySelectorAll(
+      "#root > section:not(#flyer-section) .wrap, #root > footer .wrap"
+    ).forEach(function (element) {
+      revealElements.push(element);
+    });
+
+    const revealObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("premium-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    revealElements.forEach(function (element) {
+      element.classList.add("premium-reveal");
+      revealObserver.observe(element);
+    });
+
+    if (!audio || !audioControl) return;
+
+    audio.volume = 0.28;
+
+    function syncAudioControl() {
+      const playing = !audio.paused && !audio.ended;
+      audioControl.classList.toggle("is-playing", playing);
+      audioControl.setAttribute("aria-pressed", String(playing));
+      audioControl.setAttribute(
+        "aria-label",
+        playing ? "Pause background music" : "Play background music"
+      );
+    }
+
+    async function playAudio() {
+      try {
+        await audio.play();
+      } catch (error) {
+        /* Browser may block playback until a direct user interaction. */
+      }
+      syncAudioControl();
+    }
+
+    audioControl.addEventListener("click", function () {
+      if (audio.paused) playAudio();
+      else audio.pause();
+    });
+    audio.addEventListener("play", syncAudioControl);
+    audio.addEventListener("pause", syncAudioControl);
+
+    if (gate) {
+      gate.addEventListener("click", playAudio, { once: true, capture: true });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.requestAnimationFrame(initializePremiumExperience);
+  }, { once: true });
 })();
 </script>
 
